@@ -1,4 +1,5 @@
 from flask import render_template
+from copy import copy
 
 class FormElement(object):
     """
@@ -34,6 +35,12 @@ class FormElement(object):
         """
         return render_template("form/field.jinja2", field=self)
 
+    def __call__(self):
+        """
+        Validate us
+        """
+        self.validate(self)
+
 class element(object):
     """
     A decorator to turn a method of one of the Form class' descendents into a
@@ -68,9 +75,39 @@ class Form(object):
         """
         Initialize the form from a dict of values.
         """
+
+        self.fields = [ copy(x) for x in self.fields ]
         for i in self.fields:
+            i.complaints = []
             if content.has_key(i.name):
                 i.content = content[i.name]
+
+    def __getstate__(self):
+        """
+        Clean out the function references from the elements before we
+        serialize, otherwise we'll error out.
+        """
+        data = copy(self.__dict__)
+
+        data['fields'] = [ x.__dict__ for x in self.fields ]
+
+        for i in data['fields']:
+            del i['validate']
+
+        return data
+
+    def __setstate__(self, state):
+        """
+        Restore our slightly mutilated pickle state. We do this since there's
+        function references in FormElement that can't be pickled, so we have to
+        chop them out before pickling.
+        """
+        self.__dict__.update(state)
+
+        fields_data = self.fields
+        self.fields = [ copy(x) for x in self.__class__.fields ]
+        for i in range(0, len(self.fields)):
+            self.fields[i].__dict__.update(fields_data[i])
 
     def validate(self):
         """
