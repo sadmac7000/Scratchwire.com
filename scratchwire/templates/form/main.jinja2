@@ -1,0 +1,6 @@
+<form action='{{url_for(form.action)}}' method='{{form.method}}'>
+{% for field in form.fields %}
+{{field.render()}}
+{% endfor %}
+<input type="submit" value="Go" />
+</form>

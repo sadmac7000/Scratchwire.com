@@ -1,0 +1,5 @@
+{% for complaint in field.complaints %}
+<p>{{complaint}}</p>
+{% endfor %}
+<label for='{{field.name}}'>{{field.label}}</label>
+<input id='{{field.name}}' type='{{field.ftype}}' name='{{field.name}}' value='{{field.content}}' />

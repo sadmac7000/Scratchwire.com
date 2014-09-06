@@ -1,0 +1,11 @@
+[app:main]
+use = egg:ScratchWire.com
+db.uri = sqlite://changeme
+debug = true
+session.key=dummy
+session.type=filesystem
+
+[server:main]
+use = egg:PasteScript#wsgiutils
+host = 0.0.0.0
+port = 8080

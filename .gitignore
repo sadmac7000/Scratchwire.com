@@ -1,0 +1,9 @@
+venv
+*.pyc
+*.pyo
+*.egg-info
+build
+dist
+*.ini
+*.db
+flask_session
