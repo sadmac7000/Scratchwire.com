@@ -118,6 +118,9 @@ class Form(object):
         for i in self.fields:
             i.validate(i)
 
+        self.global_validate()
+
+        for i in self.fields:
             if len(i.complaints):
                 valid = False
 
