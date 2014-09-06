@@ -55,7 +55,11 @@ def login():
     """
     The login form page.
     """
-    form = LoginForm()
+    if session.has_key("LoginForm"):
+        form = session["LoginForm"]
+        del session["LoginForm"]
+    else:
+        form = LoginForm()
 
     return render_template("form.jinja2", form=form)
 
