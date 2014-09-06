@@ -1,6 +1,7 @@
 from scratchwire import app
 from flask import render_template, url_for, request, session, redirect
 from scratchwire.form import Form, element
+from validate_email import validate_email
 
 def monoize_multi(multidict):
     """
@@ -30,7 +31,11 @@ class LoginForm(Form):
         """
         Email address form field. We use this as our primary user identifier.
         """
-        pass
+        if not validate_email(self.content):
+            self.complaints.append("You must enter a valid e-mail address")
+        else:
+            self.value = self.content
+
 
     @element(label="Password", ftype="password")
     def password(self):
@@ -39,6 +44,8 @@ class LoginForm(Form):
         """
         if len(self.content) < 6:
             self.complaints.append("Password must be at least 6 characters")
+        else:
+            self.value = self.content
 
     fields = [email, password]
     action = 'login_submit'
