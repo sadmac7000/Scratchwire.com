@@ -86,7 +86,6 @@ class RegistrationForm(LoginForm):
             return
 
         if user != None:
-            print user
             self.fields[0].complaints.append("E-mail address already in use")
 
         if password != confirm_password:
