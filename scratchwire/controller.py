@@ -136,6 +136,11 @@ def login():
 
     return render_template("form.jinja2", form=form)
 
+@app.route('/logout')
+def logout():
+    del session["User"]
+    return bail_redirect()
+
 @app.route('/register', methods=['GET','POST'])
 def register():
     """
