@@ -8,6 +8,32 @@ def config_truth(string):
 
     return (string == 'true' or string == '1')
 
+def config_type(name, type, default=None):
+    target = app.config
+
+    keylets = name.split('.')
+
+    while len(keylets) > 1:
+        if not target.has_key(keylets[0]):
+            if default != None:
+                target[keylets[0]] = {}
+            else:
+                return
+        target = target[keylets[0]]
+        keylets.pop(0)
+
+    name = keylets[0]
+
+    if not target.has_key(name):
+        if default != None:
+            target[name] = default
+        return
+
+    if type == 'int':
+        target[name] = int(target[name])
+    if type == 'boolean':
+        target[name] = target[name].lower() in ['true', '1']
+
 def config_app(conf):
     """
     Load configuration from the paste INI file into Flask
@@ -20,6 +46,30 @@ def config_app(conf):
     app.config['SESSION_TYPE'] = conf['session.type']
     Session(app)
     app.secret_key = conf['session.key']
+
+    scratchwire_conf = {}
+
+    for key in conf.keys():
+        keylets = key.split('.')
+        if keylets[0] != 'scratchwire':
+            continue
+
+        keylets.pop(0)
+
+        location = scratchwire_conf
+
+        while len(keylets) > 1:
+            if not location.has_key(keylets[0]):
+                location[keylets[0]] = {}
+            location = location[keylets[0]]
+            keylets.pop(0)
+
+        location[keylets[0]] = conf[key]
+
+    app.config.update(scratchwire_conf)
+    config_type('verify_expires_days', 'int', 7)
+    config_type('alias_expires_days', 'int', 7)
+    config_type('alias_count', 'int', 3)
 
     app.config['smtp_server'] = conf['email.smtp_server']
     if conf.has_key('email.smtp_port'):
@@ -35,11 +85,6 @@ def config_app(conf):
 
     app.config['default_sender'] = conf['email.default_sender']
 
-    if conf.has_key('scratchwire.verify_expires_days'):
-        app.config['verify_expires_days'] = \
-                int(conf['scratchwire.verify_expires_days'])
-    else:
-        app.config['verify_expires_days'] = 7
 
 def wsgi_factory(global_config, **local_config):
     """
