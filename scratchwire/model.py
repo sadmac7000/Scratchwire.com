@@ -87,7 +87,8 @@ class VerifyUrl(db.Model):
 
         self.user_id = user_id
         self.id = b64encode(os.urandom(24), ['-', '_'])
-        self.expires = datetime.utcnow() + timedelta(days=7)
+        self.expires = datetime.utcnow() + timedelta(days= \
+                app.config['verify_expires_days'])
 
     def send_email(self):
         Email("verification.jinja2", "Welcome to scratchwire.com", \

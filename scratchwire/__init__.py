@@ -35,6 +35,11 @@ def config_app(conf):
 
     app.config['default_sender'] = conf['email.default_sender']
 
+    if conf.has_key('scratchwire.verify_expires_days'):
+        app.config['verify_expires_days'] = \
+                int(conf['scratchwire.verify_expires_days'])
+    else:
+        app.config['verify_expires_days'] = 7
 
 def wsgi_factory(global_config, **local_config):
     """
