@@ -5,6 +5,15 @@
     <title>Scratchwire</title>
   </head>
   <body>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul>
+          {% for message in messages %}
+            {{ message }}
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
     <nav>
       <a href="{{url_for('login')}}">Log in</a>
     </nav>

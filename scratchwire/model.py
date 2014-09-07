@@ -1,5 +1,8 @@
 from scratchwire import app
 from flask.ext.sqlalchemy import SQLAlchemy
+from hashlib import sha224
+from base64 import b64encode
+import os
 
 db = SQLAlchemy(app)
 
@@ -28,8 +31,42 @@ class User(db.Model):
     id = IDColumn()
     email = NNColumn(db.String(120), unique = True)
     pass_salt = NNColumn(db.String(8))
-    pass_hash = NNColumn(db.String(32))
+    pass_hash = NNColumn(db.String(40))
     email_verified = NNColumn(db.Boolean())
+
+    def __init__(self):
+        """
+        Blank out this user
+        """
+        self.email = ""
+        self.pass_salt = ""
+        self.pass_hash = ""
+        self.email_verified = False
+
+    def hash_pass(self, password):
+        """
+        Perform our salted hashing algorithm and get the resulting digest
+        """
+        return b64encode(sha224(self.pass_salt + password).digest())
+
+    def check_pass(self, password):
+        """
+        Check whether a given password is this users'
+        """
+        return self.hash_pass(password) == self.pass_hash
+
+    def set_salt(self):
+        """
+        Set a new salt for this user
+        """
+        self.pass_salt = b64encode(os.urandom(7))[0:8]
+
+    def set_pass(self, password):
+        """
+        Set a new password for this user
+        """
+        self.set_salt()
+        self.pass_hash = self.hash_pass(password)
 
 class VerifyUrl(db.Model):
     """
