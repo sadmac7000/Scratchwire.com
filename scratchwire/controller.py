@@ -161,7 +161,7 @@ def home():
     """
     A largely static home page.
     """
-    return render_template("home.jinja2")
+    return render_template("home.html")
 
 @app.route('/logout')
 def logout():

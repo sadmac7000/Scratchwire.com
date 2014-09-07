@@ -1,4 +1,4 @@
-from flask import render_template, session, redirect, url_for, request
+from flask import render_template, session, redirect, url_for, request, Markup
 from copy import copy
 from scratchwire.util import monoize_multi
 
@@ -47,7 +47,7 @@ class FormElement(object):
         """
         Render the HTML necessary to draw this form element.
         """
-        return render_template("form/field.jinja2", field=self)
+        return Markup(render_template("form/field.html", field=self))
 
     def __call__(self, instance):
         """
@@ -153,7 +153,7 @@ class Form(object):
         """
         Render the form as HTML
         """
-        return render_template("form/main.jinja2", form=self)
+        return Markup(render_template("form/main.html", form=self))
 
     def __repr__(self):
         """
@@ -168,7 +168,7 @@ class Form(object):
         """
         Handle a request to draw this form
         """
-        return render_template("form.jinja2", form=self)
+        return render_template("form.html", form=self)
 
     @classmethod
     def page_handle_request(klass, **action_vars):
