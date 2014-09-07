@@ -119,7 +119,8 @@ def login():
 
 @app.route('/logout')
 def logout():
-    del session["User"]
+    if session.has_key("User"):
+        del session["User"]
     return bail_redirect()
 
 @app.route('/register', methods=['GET','POST'])
