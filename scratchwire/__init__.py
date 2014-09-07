@@ -67,9 +67,9 @@ def config_app(conf):
         location[keylets[0]] = conf[key]
 
     app.config.update(scratchwire_conf)
-    config_type('verify_expires_days', 'int', 7)
-    config_type('alias_expires_days', 'int', 7)
-    config_type('alias_count', 'int', 3)
+    config_type('verify.expires_days', 'int', 7)
+    config_type('alias.expires_days', 'int', 7)
+    config_type('alias.count', 'int', 3)
     config_type('email.smtp_tls', 'boolean', False)
 
 

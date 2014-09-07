@@ -10,9 +10,9 @@ scratchwire.email.smtp_login=user
 scratchwire.email.smtp_pass=pass
 scratchwire.email.smtp_tls=true
 scratchwire.email.default_sender=noreply@scratchwire.com
-#scratchwire.verify_expires_days=7
-#scratchwire.alias_expires_days=7
-#scratchwire.alias_count=3
+#scratchwire.verify.expires_days=7
+#scratchwire.alias.expires_days=7
+#scratchwire.alias.count=3
 
 [server:main]
 use = egg:PasteScript#wsgiutils
