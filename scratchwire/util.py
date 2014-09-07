@@ -1,3 +1,5 @@
+from flask import redirect, url_for
+
 def monoize_multi(multidict):
     """
     Multidicts turn into lists of dicts when you cast them. We run into them

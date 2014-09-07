@@ -4,6 +4,12 @@ db.uri = sqlite://changeme
 debug = true
 session.key=dummy
 session.type=filesystem
+email.smtp_server=localhost
+email.smtp_port=25
+email.smtp_login=user
+email.smtp_pass=pass
+email.smtp_tls=true
+email.default_sender=noreply@scratchwire.com
 
 [server:main]
 use = egg:PasteScript#wsgiutils

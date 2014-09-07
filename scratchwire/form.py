@@ -157,7 +157,7 @@ class Form(object):
         return render_template("form.jinja2", form=self)
 
     @classmethod
-    def page_handle_request(klass, request, action_vars={}):
+    def page_handle_request(klass, request, **action_vars):
         """
         Handle a request object.
         """

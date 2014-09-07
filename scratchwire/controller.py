@@ -1,9 +1,18 @@
 from scratchwire import app
-from scratchwire.model import db, User
+from scratchwire.model import db, User, VerifyUrl
 from flask import render_template, url_for, request, session, redirect, flash
+from flask import abort
 from scratchwire.form import Form, element
+from scratchwire.mailer import Email
 from validate_email import validate_email
 from scratchwire.util import monoize_multi, bail_redirect
+from datetime import datetime
+
+@app.before_request
+def expire_user():
+    if session.has_key('User'):
+        db.session.add(session['User'])
+        db.session.expire(session['User'])
 
 class LoginForm(Form):
     """
@@ -92,8 +101,11 @@ class RegistrationForm(LoginForm):
             self.fields[1].complaints.append("Passwords do not match")
 
     def handle_valid(self):
+        verify_url = VerifyUrl(self.user)
         db.session.add(self.user)
+        db.session.add(verify_url)
         db.session.commit()
+        verify_url.send_email()
         flash(
         """We have sent you an email to confirm your email address.
         Please click on the link to confirm your registration.""")
@@ -101,6 +113,44 @@ class RegistrationForm(LoginForm):
 
     fields = [LoginForm.email, LoginForm.password, confirm_password]
     action = 'register'
+
+class VerifyForm(LoginForm):
+    def setup(self):
+        id = self.action_vars['verify_id']
+        self.verify = VerifyUrl.query.filter(VerifyUrl.id == id,
+                VerifyUrl.expires > datetime.utcnow()).first()
+
+        if not self.verify:
+            abort(404)
+
+    def global_validate(self, valid_so_far):
+        """
+        Validate the verified user
+        """
+        password = self.fields[0].value
+
+        if not valid_so_far:
+            return
+
+        if not self.verify.user.check_pass(password):
+            self.fields[0].complaints.append("Invalid password")
+
+    def handle_valid(self):
+        """
+        Verify the user
+        """
+        session['User'] = self.verify.user
+        session['User'].email_verified = True
+
+        db.session.add(session['User'])
+        db.session.commit()
+
+        flash("Your email address has been verified successfully")
+
+        return bail_redirect()
+
+    fields = [LoginForm.password]
+    action = 'verify'
 
 @app.route('/')
 def home():
@@ -128,3 +178,10 @@ def register():
     The registration form page.
     """
     return RegistrationForm.page_handle_request(request)
+
+@app.route('/verify/<verify_id>', methods=['GET','POST'])
+def verify(verify_id):
+    """
+    Email verification page.
+    """
+    return VerifyForm.page_handle_request(request, verify_id=verify_id)

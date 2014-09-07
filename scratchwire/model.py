@@ -1,7 +1,9 @@
 from scratchwire import app
+from scratchwire.mailer import Email
 from flask.ext.sqlalchemy import SQLAlchemy
 from hashlib import sha224
 from base64 import b64encode
+from datetime import datetime, timedelta
 import os
 
 db = SQLAlchemy(app)
@@ -73,6 +75,24 @@ class VerifyUrl(db.Model):
     A verification URL, used to have users verify their email addresses upon
     registering.
     """
+
+    def __init__(self, user_id):
+        """
+        Create a new randomized verification URL
+        """
+        if user_id.__class__ == User:
+            self.user = user_id
+        else:
+            self.user_id = user_id
+
+        self.user_id = user_id
+        self.id = b64encode(os.urandom(24), ['-', '_'])
+        self.expires = datetime.utcnow() + timedelta(days=7)
+
+    def send_email(self):
+        Email("verification.jinja2", "Welcome to scratchwire.com", \
+                verify_id=self.id).send(None, self.user.email)
+
     id = db.Column(db.String(32), primary_key = True)
     user_id = NNForeignID('user.id')
     user = db.relationship('User', backref='verify_urls')
