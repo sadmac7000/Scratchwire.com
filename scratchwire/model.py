@@ -14,17 +14,17 @@ def NNColumn(*args, **kwargs):
     """
     return db.Column(*args, nullable = False, **kwargs)
 
-def IDColumn():
+def IDColumn(*args, **kwargs):
     """
     An integer primary key column
     """
-    return db.Column(db.Integer, primary_key = True)
+    return db.Column(db.Integer, *args, primary_key = True, **kwargs)
 
-def NNForeignID(key):
+def NNForeignID(key, *args, **kwargs):
     """
     An integer foreign key column
     """
-    return NNColumn(db.Integer, db.ForeignKey(key))
+    return NNColumn(db.Integer, db.ForeignKey(key), *args, **kwargs)
 
 class User(db.Model):
     """
@@ -182,8 +182,22 @@ class Alias(db.Model):
     An alias for a given user. We assign these so users can hook together
     anonymously.
     """
-    id = IDColumn()
-    user_id = NNForeignID('user.id')
+
+    def __init__(self, user):
+        adjective = Adjective.query.order_by('random()').first()
+        noun = Noun.query.order_by('random()').first()
+        adjective = adjective.lower()
+        noun = noun.lower()
+        adjective[0:1] = adjective[0:1].upper()
+        noun[0:1] = noun[0:1].upper()
+        self.name = adjective + noun
+        self.active = datetime.utcnow()
+        self.expire = self.active + timedelta(days= \
+                app.config['alias_expires_days'])
+        self.user = user
+
+
+    user_id = NNForeignID('user.id', primary_key=True)
     user = db.relationship('User', backref='aliases')
     active = NNColumn(db.DateTime)
     expire = db.Column(db.DateTime)

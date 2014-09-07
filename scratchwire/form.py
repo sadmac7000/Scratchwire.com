@@ -40,6 +40,8 @@ class FormElement(object):
         def new_call(target):
             target.validate(target)
 
+        new_call.__name__ = '__call__'
+
         ret.__call__ = new_call
         return ret
 
@@ -114,6 +116,7 @@ class Form(object):
 
         for i in data['fields']:
             del i['validate']
+            del i['__call__']
 
         return data
 

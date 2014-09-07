@@ -70,20 +70,7 @@ def config_app(conf):
     config_type('verify_expires_days', 'int', 7)
     config_type('alias_expires_days', 'int', 7)
     config_type('alias_count', 'int', 3)
-
-    app.config['smtp_server'] = conf['email.smtp_server']
-    if conf.has_key('email.smtp_port'):
-        app.config['smtp_port'] = conf['email.smtp_port']
-    if conf.has_key('email.smtp_login'):
-        app.config['smtp_login'] = conf['email.smtp_login']
-    if conf.has_key('email.smtp_pass'):
-        app.config['smtp_pass'] = conf['email.smtp_pass']
-    if conf.has_key('email.smtp_tls'):
-        app.config['smtp_tls'] = config_truth(conf['email.smtp_tls'])
-    else:
-        app.config['smtp_tls'] = False
-
-    app.config['default_sender'] = conf['email.default_sender']
+    config_type('email.smtp_tls', 'boolean', False)
 
 
 def wsgi_factory(global_config, **local_config):

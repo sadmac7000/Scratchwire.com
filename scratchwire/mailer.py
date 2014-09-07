@@ -29,8 +29,10 @@ class Email(object):
         return emails, mimenames
 
     def send(self, sender=None, *recipients):
+        mail_config = app.config['email']
+
         if sender == None:
-            sender = app.config['default_sender']
+            sender = mail_config['default_sender']
 
         msg = MIMEText(self.template.render(**self.args))
 
@@ -46,17 +48,17 @@ class Email(object):
         else:
             msg['From'] = sender
 
-        if app.config.has_key('smtp_port'):
-            s = SMTP(app.config['smtp_server'], app.config['smtp_port'])
+        if mail_config.has_key('smtp_port'):
+            s = SMTP(mail_config['smtp_server'], mail_config['smtp_port'])
         else:
-            s = SMTP(app.config['smtp_server'])
+            s = SMTP(mail_config['smtp_server'])
 
-        if app.config['smtp_tls']:
+        if mail_config['smtp_tls']:
             s.starttls()
             s.ehlo()
 
-        if app.config.has_key('smtp_pass'):
-            s.login(app.config['smtp_login'], app.config['smtp_pass'])
+        if mail_config.has_key('smtp_pass'):
+            s.login(mail_config['smtp_login'], mail_config['smtp_pass'])
 
         s.sendmail(sender, emails, msg.as_string())
         s.close()
