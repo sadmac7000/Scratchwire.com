@@ -1,5 +1,6 @@
-from flask import render_template
+from flask import render_template, session
 from copy import copy
+from scratchwire.util import monoize_multi
 
 class FormElement(object):
     """
@@ -141,3 +142,31 @@ class Form(object):
         data = "<form:%s:%s " % (self.method, self.action)
         data += ", ".join([ "( %s " % x for x in self.fields ])
         return data
+
+    def handle_ready(self):
+        """
+        Handle a request to draw this form
+        """
+        return render_template("form.jinja2", form=self)
+
+    @classmethod
+    def page_handle_request(klass, request):
+        """
+        Handle a request object.
+        """
+        if request.method == 'POST':
+            reqvars = monoize_multi(request.form)
+            form = klass(**reqvars)
+
+            if form.validate():
+                return form.handle_valid()
+            else:
+                session[klass.__name__] = form
+                return redirect(url_for(klass.action))
+        elif session.has_key(klass.__name__):
+            form = session[klass.__name__]
+            del session[klass.__name__]
+        else:
+            form = klass()
+
+        return form.handle_ready()

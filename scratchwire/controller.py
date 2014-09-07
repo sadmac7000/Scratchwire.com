@@ -31,6 +31,9 @@ class LoginForm(Form):
             self.value = self.content
 
     def global_validate(self, valid_so_far):
+        """
+        Validate the entered user and fetch his database entry
+        """
         email = self.fields[0].value
         password = self.fields[1].value
 
@@ -41,11 +44,17 @@ class LoginForm(Form):
         elif valid_so_far:
             self.fields[0].complaints.append("Invalid email or password")
 
+    def handle_valid(self):
+        """
+        Handle a valid submission of this form
+        """
+        session["User"] = self.user
+        return bail_redirect()
+
     fields = [email, password]
     action = 'login'
 
 class RegistrationForm(LoginForm):
-
     @element(label="Confirm Password", ftype="password")
     def confirm_password(self):
         """
@@ -54,6 +63,9 @@ class RegistrationForm(LoginForm):
         self.value = self.content
 
     def global_validate(self, valid_so_far):
+        """
+        Validate the user and add him
+        """
         email = self.fields[0].value
         password = self.fields[1].value
         confirm_password = self.fields[2].value
@@ -74,6 +86,14 @@ class RegistrationForm(LoginForm):
 
         if password != confirm_password:
             self.fields[1].complaints.append("Passwords do not match")
+
+    def handle_valid(self):
+        db.session.add(self.user)
+        db.session.commit()
+        flash(
+        """We have sent you an email to confirm your email address.
+        Please click on the link to confirm your registration.""")
+        return bail_redirect()
 
     fields = [LoginForm.email, LoginForm.password, confirm_password]
     action = 'register'
@@ -100,23 +120,7 @@ def login():
     """
     The login form page.
     """
-    if request.method == 'POST':
-        reqvars = monoize_multi(request.form)
-        form = LoginForm(**reqvars)
-
-        if form.validate():
-            session["User"] = form.user
-            return bail_redirect()
-        else:
-            session["LoginForm"] = form
-            return redirect(url_for('login'))
-    elif session.has_key("LoginForm"):
-        form = session["LoginForm"]
-        del session["LoginForm"]
-    else:
-        form = LoginForm()
-
-    return render_template("form.jinja2", form=form)
+    return LoginForm.page_handle_request(request)
 
 @app.route('/logout')
 def logout():
@@ -128,24 +132,4 @@ def register():
     """
     The registration form page.
     """
-    if request.method == 'POST':
-        reqvars = monoize_multi(request.form)
-        form = RegistrationForm(**reqvars)
-
-        if form.validate():
-            db.session.add(form.user)
-            db.session.commit()
-            flash(
-            """We have sent you an email to confirm your email address.
-            Please click on the link to confirm your registration""")
-            return bail_redirect()
-        else:
-            session["RegistrationForm"] = form
-            return redirect(url_for('register'))
-    elif session.has_key("RegistrationForm"):
-        form = session["RegistrationForm"]
-        del session["RegistrationForm"]
-    else:
-        form = RegistrationForm()
-
-    return render_template("form.jinja2", form=form)
+    return RegistrationForm.page_handle_request(request)
