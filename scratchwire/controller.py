@@ -152,6 +152,10 @@ class VerifyForm(LoginForm):
     fields = [LoginForm.password]
     action = 'verify'
 
+LoginForm.route(app, '/login', 'login')
+RegistrationForm.route(app, '/register', 'register')
+VerifyForm.route(app, '/verify/<verify_id>', 'verify')
+
 @app.route('/')
 def home():
     """
@@ -159,29 +163,8 @@ def home():
     """
     return render_template("home.jinja2")
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    """
-    The login form page.
-    """
-    return LoginForm.page_handle_request(request)
-
 @app.route('/logout')
 def logout():
     if session.has_key("User"):
         del session["User"]
     return bail_redirect()
-
-@app.route('/register', methods=['GET','POST'])
-def register():
-    """
-    The registration form page.
-    """
-    return RegistrationForm.page_handle_request(request)
-
-@app.route('/verify/<verify_id>', methods=['GET','POST'])
-def verify(verify_id):
-    """
-    Email verification page.
-    """
-    return VerifyForm.page_handle_request(request, verify_id=verify_id)

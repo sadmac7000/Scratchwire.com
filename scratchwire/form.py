@@ -1,4 +1,4 @@
-from flask import render_template, session, redirect, url_for
+from flask import render_template, session, redirect, url_for, request
 from copy import copy
 from scratchwire.util import monoize_multi
 
@@ -157,7 +157,7 @@ class Form(object):
         return render_template("form.jinja2", form=self)
 
     @classmethod
-    def page_handle_request(klass, request, **action_vars):
+    def page_handle_request(klass, **action_vars):
         """
         Handle a request object.
         """
@@ -177,3 +177,8 @@ class Form(object):
             form = klass(action_vars)
 
         return form.handle_ready()
+
+    @classmethod
+    def route(klass, app, rule, endpoint):
+        app.add_url_rule(rule=rule, endpoint=endpoint, \
+                view_func=klass.page_handle_request, methods=['GET', 'POST'])
