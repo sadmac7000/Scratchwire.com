@@ -19,25 +19,25 @@ class LoginForm(Form):
     Standard issue login form. Nothing exciting here.
     """
     @element(label="E-Mail", ftype="email")
-    def email(self):
+    def email(self, field):
         """
         Email address form field. We use this as our primary user identifier.
         """
-        if not validate_email(self.content):
-            self.complaints.append("You must enter a valid e-mail address")
+        if not validate_email(field.content):
+            field.complaints.append("You must enter a valid e-mail address")
         else:
-            self.value = self.content
+            field.value = field.content
 
 
     @element(label="Password", ftype="password")
-    def password(self):
+    def password(self, field):
         """
         Password form field.
         """
-        if len(self.content) < 6:
-            self.complaints.append("Password must be at least 6 characters")
+        if len(field.content) < 6:
+            field.complaints.append("Password must be at least 6 characters")
         else:
-            self.value = self.content
+            field.value = field.content
 
     def global_validate(self, valid_so_far):
         """
@@ -65,16 +65,16 @@ class LoginForm(Form):
         session["User"] = self.user
         return bail_redirect()
 
-    fields = [email, password]
+    fields = ['email', 'password']
     action = 'login'
 
 class RegistrationForm(LoginForm):
     @element(label="Confirm Password", ftype="password")
-    def confirm_password(self):
+    def confirm_password(self, field):
         """
         Confirm password form field.
         """
-        self.value = self.content
+        field.value = field.content
 
     def global_validate(self, valid_so_far):
         """
@@ -111,7 +111,7 @@ class RegistrationForm(LoginForm):
         Please click on the link to confirm your registration.""")
         return bail_redirect()
 
-    fields = [LoginForm.email, LoginForm.password, confirm_password]
+    fields = ['email', 'password', 'confirm_password']
     action = 'register'
 
 class VerifyForm(LoginForm):
@@ -149,7 +149,7 @@ class VerifyForm(LoginForm):
 
         return bail_redirect()
 
-    fields = [LoginForm.password]
+    fields = ['password']
     action = 'verify'
 
 LoginForm.route(app, '/login', 'login')

@@ -22,7 +22,7 @@ class FormElement(object):
         """
         Get a textual debug representation of this object
         """
-        data = "%s (%s - %s): %s" % (self.name, self.label, self.ftype,
+        data = "<%s (%s - %s): %s>" % (self.name, self.label, self.ftype,
                 self.content)
 
         if len(self.complaints) > 0:
@@ -30,17 +30,30 @@ class FormElement(object):
 
         return data
 
+    def __get__(self, instance, owner):
+        if not instance:
+            return self
+
+        ret = copy(self)
+        ret.validate = ret.validate.__get__(instance, owner)
+
+        def new_call(target):
+            target.validate(target)
+
+        ret.__call__ = new_call
+        return ret
+
     def render(self):
         """
         Render the HTML necessary to draw this form element.
         """
         return render_template("form/field.jinja2", field=self)
 
-    def __call__(self):
+    def __call__(self, instance):
         """
         Validate us
         """
-        self.validate(self)
+        self.validate(instance, self)
 
 class element(object):
     """
@@ -79,7 +92,7 @@ class Form(object):
 
         self.action_vars = action_vars
 
-        self.fields = [ copy(x) for x in self.fields ]
+        self.fields = [ getattr(self, x) for x in self.fields ]
         for i in self.fields:
             i.complaints = []
             if content.has_key(i.name):
@@ -113,7 +126,7 @@ class Form(object):
         self.__dict__.update(state)
 
         fields_data = self.fields
-        self.fields = [ copy(x) for x in self.__class__.fields ]
+        self.fields = [ getattr(self, x) for x in self.__class__.fields ]
         for i in range(0, len(self.fields)):
             self.fields[i].__dict__.update(fields_data[i])
 
@@ -147,7 +160,8 @@ class Form(object):
         Get a debug representation of this object
         """
         data = "<form:%s:%s " % (self.method, self.action)
-        data += ", ".join([ "( %s " % x for x in self.fields ])
+        data += ", ".join([ "( %s )" % x for x in self.fields ])
+        data += ">"
         return data
 
     def handle_ready(self):
