@@ -10,6 +10,8 @@ setup(
             'validate_email', 'email'],
         entry_points={
             'paste.app_factory': [ 'main=scratchwire:wsgi_factory' ],
-            'paste.app_install': [ 'main=paste.script.appinstall:Installer' ]
+            'paste.app_install': [ 'main=paste.script.appinstall:Installer' ],
+            'paste.paster_command': \
+                    [ 'load-words=scratchwire.paster:LoadWords' ]
             }
         )

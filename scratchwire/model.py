@@ -124,12 +124,18 @@ class Noun(db.Model):
     """
     An English noun. Used for random phrase generation
     """
+    def __init__(self, word):
+        self.noun = word
+
     noun = NNColumn(db.String, primary_key = True)
 
 class Adjective(db.Model):
     """
     An English adjective. Used for random phrase generation
     """
+    def __init__(self, word):
+        self.adjective = word
+
     adjective = NNColumn(db.String, primary_key = True)
 
 class Encounter(db.Model):
