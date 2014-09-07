@@ -3,7 +3,7 @@ from scratchwire.model import db, User
 from flask import render_template, url_for, request, session, redirect, flash
 from scratchwire.form import Form, element
 from validate_email import validate_email
-from scratchwire.util import monoize_multi
+from scratchwire.util import monoize_multi, bail_redirect
 
 class LoginForm(Form):
     """
@@ -97,16 +97,6 @@ class RegistrationForm(LoginForm):
 
     fields = [LoginForm.email, LoginForm.password, confirm_password]
     action = 'register'
-
-def bail_redirect():
-    """
-    We were redirected on a detour, such as being prompted to log in, and now
-    we can go back to where we were. This will give us the appropriate
-    redirect.
-    """
-
-    # FIXME: make this do something more ornate
-    return redirect(url_for('home'))
 
 @app.route('/')
 def home():

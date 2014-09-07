@@ -16,3 +16,14 @@ def monoize_multi(multidict):
         singledict[i] = singledict[i][0]
 
     return singledict
+
+def bail_redirect():
+    """
+    We were redirected on a detour, such as being prompted to log in, and now
+    we can go back to where we were. This will give us the appropriate
+    redirect.
+    """
+
+    # FIXME: make this do something more ornate
+    return redirect(url_for('home'))
+
