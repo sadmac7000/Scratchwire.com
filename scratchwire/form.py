@@ -85,6 +85,11 @@ class Form(object):
             if content.has_key(i.name):
                 i.content = content[i.name]
 
+        self.setup()
+
+    def setup(self):
+        pass
+
     def __getstate__(self):
         """
         Clean out the function references from the elements before we
