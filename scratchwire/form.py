@@ -72,10 +72,12 @@ class Form(object):
     fields = []
     method = "POST"
 
-    def __init__(self, **content):
+    def __init__(self, action_vars = {}, content = {}):
         """
         Initialize the form from a dict of values.
         """
+
+        self.action_vars = action_vars
 
         self.fields = [ copy(x) for x in self.fields ]
         for i in self.fields:
@@ -150,23 +152,23 @@ class Form(object):
         return render_template("form.jinja2", form=self)
 
     @classmethod
-    def page_handle_request(klass, request):
+    def page_handle_request(klass, request, action_vars={}):
         """
         Handle a request object.
         """
         if request.method == 'POST':
             reqvars = monoize_multi(request.form)
-            form = klass(**reqvars)
+            form = klass(action_vars, reqvars)
 
             if form.validate():
                 return form.handle_valid()
             else:
                 session[klass.__name__] = form
-                return redirect(url_for(klass.action))
+                return redirect(url_for(klass.action, **action_vars))
         elif session.has_key(klass.__name__):
             form = session[klass.__name__]
             del session[klass.__name__]
         else:
-            form = klass()
+            form = klass(action_vars)
 
         return form.handle_ready()
