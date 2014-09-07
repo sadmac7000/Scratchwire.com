@@ -75,6 +75,7 @@ class VerifyUrl(db.Model):
     """
     id = db.Column(db.String(32), primary_key = True)
     user_id = NNForeignID('user.id')
+    user = db.relationship('User', backref='verify_urls')
     expires = NNColumn(db.DateTime())
 
 class Disease(db.Model):
@@ -92,7 +93,9 @@ class Test(db.Model):
     __table_args__ = (db.PrimaryKeyConstraint('disease_id', 'user_id', 'date'),)
 
     disease_id = NNForeignID('disease.id')
+    diseases = db.relationship('Disease', backref='tests')
     user_id = NNForeignID('user.id')
+    user = db.relationship('User', backref='tests')
     date = NNColumn(db.DateTime)
     positive = NNColumn(db.Boolean)
 
@@ -114,6 +117,8 @@ class Encounter(db.Model):
     """
     id = IDColumn()
     date = NNColumn(db.DateTime)
+    participants = db.relationship('User', secondary='participation', \
+            backref='encounters')
 
 class Participation(db.Model):
     """
@@ -140,7 +145,9 @@ class Occurrence(db.Model):
     __table_args__ = (db.PrimaryKeyConstraint('activity_id', 'encounter_id'),)
 
     activity_id = NNForeignID('activity.id')
+    activity = db.relationship('Activity', backref='occurences')
     encounter_id = NNForeignID('encounter.id')
+    encounter = db.relationship('Encounter', backref='occurences')
     barrier = NNColumn(db.Boolean)
 
 class Alias(db.Model):
@@ -150,6 +157,7 @@ class Alias(db.Model):
     """
     id = IDColumn()
     user_id = NNForeignID('user.id')
+    user = db.relationship('User', backref='aliases')
     active = NNColumn(db.DateTime)
     expire = db.Column(db.DateTime)
     name = NNColumn(db.String())
