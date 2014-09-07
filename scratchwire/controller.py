@@ -39,10 +39,15 @@ class LoginForm(Form):
 
         user = User.query.filter_by(email=email).first()
 
-        if valid_so_far and user != None and user.check_pass(password):
-            self.user = user
-        elif valid_so_far:
+        if user == None or not user.check_pass(password):
             self.fields[0].complaints.append("Invalid email or password")
+        elif not user.email_verified:
+            self.fields[0].complaints.append("""You have not yet validated your
+                    email address""")
+
+        if valid_so_far and len(self.fields[0].complaints) == 0:
+            self.user = user
+            return
 
     def handle_valid(self):
         """
