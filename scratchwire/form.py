@@ -56,25 +56,13 @@ class FormElement(object):
         ret = copy(self)
         ret.validate = ret.validate.__get__(instance, owner)
 
-        def new_call(target):
-            target.validate(target)
-
-        new_call.__name__ = '__call__'
-
-        ret.__call__ = new_call
         return ret
 
-    def render(self):
+    def __call__(self):
         """
         Render the HTML necessary to draw this form element.
         """
         return Markup(render_template("form/field.html", field=self))
-
-    def __call__(self, instance):
-        """
-        Validate us
-        """
-        self.validate(instance, self)
 
 class element(object):
     """
@@ -135,7 +123,6 @@ class Form(object):
 
         for i in data['fields']:
             del i['validate']
-            del i['__call__']
 
         return data
 
