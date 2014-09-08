@@ -100,12 +100,23 @@ class Form(object):
 
         self.action_vars = action_vars
 
-        for i,j in self.__class__.__dict__.iteritems():
-            if type(j) != FormElement:
+        for klass in self.__class__.mro():
+            if not issubclass(klass, Form):
                 continue
-            j = getattr(self, i)
-            j.complaints = []
-            setattr(self, i, j)
+
+            for i,j in klass.__dict__.iteritems():
+                if self.__dict__.has_key(i):
+                    continue
+                if type(j) != FormElement:
+                    continue
+                j = getattr(self, i)
+                if j == None:
+                    continue
+                j.complaints = []
+                setattr(self, i, j)
+
+                if content.has_key(i):
+                    j.content = content[i]
 
         self.setup()
 

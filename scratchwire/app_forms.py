@@ -128,6 +128,8 @@ class RegistrationForm(LoginForm):
     template = 'register'
 
 class VerifyForm(LoginForm):
+    email = None
+
     def setup(self):
         id = self.action_vars['verify_id']
         self.verify = VerifyUrl.query.filter(VerifyUrl.id == id,
