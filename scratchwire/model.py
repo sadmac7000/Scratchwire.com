@@ -186,10 +186,10 @@ class Alias(db.Model):
     def __init__(self, user):
         adjective = Adjective.query.order_by('random()').first()
         noun = Noun.query.order_by('random()').first()
-        adjective = adjective.lower()
-        noun = noun.lower()
-        adjective[0:1] = adjective[0:1].upper()
-        noun[0:1] = noun[0:1].upper()
+        adjective = adjective.adjective.lower()
+        noun = noun.noun.lower()
+        adjective = adjective[0:1].upper() + adjective[1:]
+        noun = noun[0:1].upper() + noun[1:]
         self.name = adjective + noun
         self.active = datetime.utcnow()
         self.expire = self.active + timedelta(days= \
