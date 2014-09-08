@@ -10,9 +10,19 @@ from datetime import datetime
 
 @app.before_request
 def expire_user():
-    if session.has_key('User'):
-        db.session.add(session['User'])
-        db.session.expire(session['User'])
+    if not session.has_key('User'):
+        return
+
+    db.session.add(session['User'])
+    db.session.expire(session['User'])
+
+    # FIXME: This is pretty ridiculous
+    from sqlalchemy.orm.exc import ObjectDeletedError
+    try:
+        if session['User'].id == None:
+            del session['User']
+    except ObjectDeletedError:
+        del session['User']
 
 class LoginForm(Form):
     """
