@@ -46,7 +46,6 @@ def bail_redirect():
     redirect.
     """
 
-
     if session.has_key('bail_point'):
         target = session['bail_point'][0]
         args = session['bail_point'][1]
