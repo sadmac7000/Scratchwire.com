@@ -54,7 +54,7 @@ def bail_redirect():
 
         return redirect(url_for(target, **args))
 
-    return redirect(url_for(home))
+    return redirect(url_for('home'))
 
 def set_bail_point(target=None, **args):
     session['bail_point'] = (request.endpoint, request.view_args)
