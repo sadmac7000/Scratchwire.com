@@ -185,12 +185,6 @@ class Form(object):
         data += ">"
         return data
 
-    def handle_ready(self):
-        """
-        Handle a request to draw this form
-        """
-        return render_template("form.html", form=self)
-
     @classmethod
     def page_handle_request(klass, **action_vars):
         """
@@ -211,7 +205,7 @@ class Form(object):
         else:
             form = klass(action_vars)
 
-        return form.handle_ready()
+        return render_template("form.html", form=form)
 
     @classmethod
     def route(klass, app, rule, endpoint):
