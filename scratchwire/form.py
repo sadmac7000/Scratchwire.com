@@ -91,7 +91,6 @@ class Form(object):
     A web form. Capable of self-validating and of rendering itself as HTML.
     """
 
-    fields = []
     method = "POST"
 
     def __init__(self, action_vars = {}, content = {}):
@@ -101,11 +100,12 @@ class Form(object):
 
         self.action_vars = action_vars
 
-        self.fields = [ getattr(self, x) for x in self.fields ]
-        for i in self.fields:
-            i.complaints = []
-            if content.has_key(i.name):
-                i.content = content[i.name]
+        for i,j in self.__class__.__dict__.iteritems():
+            if type(j) != FormElement:
+                continue
+            j = getattr(self, i)
+            j.complaints = []
+            setattr(self, i, j)
 
         self.setup()
 
@@ -119,10 +119,11 @@ class Form(object):
         """
         data = copy(self.__dict__)
 
-        data['fields'] = [ x.__dict__ for x in self.fields ]
+        for j in data.values():
+            if type(j) != FormElement:
+                continue
 
-        for i in data['fields']:
-            del i['validate']
+            j.validate = None
 
         return data
 
@@ -134,10 +135,11 @@ class Form(object):
         """
         self.__dict__.update(state)
 
-        fields_data = self.fields
-        self.fields = [ getattr(self, x) for x in self.__class__.fields ]
-        for i in range(0, len(self.fields)):
-            self.fields[i].__dict__.update(fields_data[i])
+        for i,j in self.__dict__.iteritems():
+            if type(j) != FormElement:
+                continue
+
+            j.validate = getattr(self.__class__, i).validate
 
     def validate(self):
         """
@@ -145,14 +147,16 @@ class Form(object):
         """
         valid = True
 
-        for i in self.fields:
+        fields = [x for x in self.__dict__.values() if type(x) == FormElement]
+
+        for i in fields:
             i.validate(i)
             if len(i.complaints):
                 valid = False
 
         self.global_validate(valid)
 
-        for i in self.fields:
+        for i in fields:
             if len(i.complaints):
                 valid = False
 
@@ -172,8 +176,9 @@ class Form(object):
         """
         Get a debug representation of this object
         """
+        fields = [x for x in self.__dict__.values() if type(x) == FormElement]
         data = "<form:%s:%s " % (self.method, self.action)
-        data += ", ".join([ "( %s )" % x for x in self.fields ])
+        data += ", ".join([ "( %s )" % x for x in fields ])
         data += ">"
         return data
 

@@ -81,18 +81,22 @@ class LoginForm(Form):
         """
         Validate the entered user and fetch his database entry
         """
-        email = self.fields[0].value
-        password = self.fields[1].value
+
+        if not valid_so_far:
+            return
+
+        email = self.email.value
+        password = self.password.value
 
         user = User.query.filter_by(email=email).first()
 
         if user == None or not user.check_pass(password):
-            self.fields[0].complaints.append("Invalid email or password")
+            self.email.complaints.append("Invalid email or password")
         elif not user.email_verified:
-            self.fields[0].complaints.append("""You have not yet validated your
+            self.password.complaints.append("""You have not yet validated your
                     email address""")
 
-        if valid_so_far and len(self.fields[0].complaints) == 0:
+        if len(self.email.complaints) == 0:
             self.user = user
             return
 
@@ -103,7 +107,6 @@ class LoginForm(Form):
         session["User"] = self.user
         return bail_redirect()
 
-    fields = ['email', 'password']
     action = 'login'
 
 class RegistrationForm(LoginForm):
@@ -118,9 +121,9 @@ class RegistrationForm(LoginForm):
         """
         Validate the user and add him
         """
-        email = self.fields[0].value
-        password = self.fields[1].value
-        confirm_password = self.fields[2].value
+        email = self.email.value
+        password = self.password.value
+        confirm_password = self.confirm_password.value
 
         user = User.query.filter_by(email=email).first()
 
@@ -133,10 +136,10 @@ class RegistrationForm(LoginForm):
             return
 
         if user != None:
-            self.fields[0].complaints.append("E-mail address already in use")
+            self.email.complaints.append("E-mail address already in use")
 
         if password != confirm_password:
-            self.fields[1].complaints.append("Passwords do not match")
+            self.password.complaints.append("Passwords do not match")
 
     def handle_valid(self):
         verify_url = VerifyUrl(self.user)
@@ -149,7 +152,6 @@ class RegistrationForm(LoginForm):
         Please click on the link to confirm your registration.""")
         return bail_redirect()
 
-    fields = ['email', 'password', 'confirm_password']
     action = 'register'
 
 class VerifyForm(LoginForm):
@@ -165,13 +167,13 @@ class VerifyForm(LoginForm):
         """
         Validate the verified user
         """
-        password = self.fields[0].value
+        password = self.password.value
 
         if not valid_so_far:
             return
 
         if not self.verify.user.check_pass(password):
-            self.fields[0].complaints.append("Invalid password")
+            self.password.complaints.append("Invalid password")
 
     def handle_valid(self):
         """
@@ -187,7 +189,6 @@ class VerifyForm(LoginForm):
 
         return bail_redirect()
 
-    fields = ['password']
     action = 'verify'
 
 LoginForm.route(app, '/login', 'login')
