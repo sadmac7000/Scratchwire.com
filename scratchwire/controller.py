@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright © 2014 Casey Dahlin
 #
 # this file is part of foobar.
