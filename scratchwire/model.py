@@ -197,8 +197,8 @@ class Alias(db.Model):
         self.user = user
 
 
-    user_id = NNForeignID('user.id', primary_key=True)
+    user_id = NNForeignID('user.id')
     user = db.relationship('User', backref='aliases')
     active = NNColumn(db.DateTime)
     expire = db.Column(db.DateTime)
-    name = NNColumn(db.String())
+    name = NNColumn(db.String(), primary_key=True)
