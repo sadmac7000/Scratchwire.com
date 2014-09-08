@@ -18,7 +18,8 @@
 
 from flask import render_template, session, redirect, url_for, request, Markup
 from copy import copy
-from scratchwire.util import monoize_multi
+from scratchwire.util import monoize_multi, decamel
+from jinja2.exceptions import TemplateNotFound
 
 class FormElement(object):
     """
@@ -174,7 +175,11 @@ class Form(object):
         """
         Render the form as HTML
         """
-        return Markup(render_template("form/main.html", form=self))
+        try:
+            return Markup(render_template("form/%s.html" % \
+                    decamel(self.__class__.__name__), form=self))
+        except TemplateNotFound:
+            return Markup(render_template("form/_default.html", form=self))
 
     def __repr__(self):
         """
