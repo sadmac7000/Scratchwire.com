@@ -88,6 +88,23 @@ class User(db.Model):
         self.set_salt()
         self.pass_hash = self.hash_pass(password)
 
+    def populate_aliases(self):
+        """
+        Ensure this user has enough aliases.
+        """
+        if len(self.aliases) >= app.config['alias']['count']:
+            return self.aliases
+
+        adding = app.config['alias']['count'] - len(self.aliases)
+
+        for i in range(0,adding):
+            db.session.add(Alias(self))
+
+        db.session.commit()
+
+        return self.aliases
+
+
 class VerifyUrl(db.Model):
     """
     A verification URL, used to have users verify their email addresses upon
@@ -213,7 +230,6 @@ class Alias(db.Model):
         self.expire = self.active + timedelta(days= \
                 app.config['alias']['expires_days'])
         self.user = user
-
 
     user_id = NNForeignID('user.id')
     user = db.relationship('User', backref='aliases')

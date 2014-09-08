@@ -68,15 +68,6 @@ def logout():
 @app.route('/aliases')
 @requires_login
 def aliases():
-    aliases = session["User"].aliases
-
-    if len(aliases) < app.config['alias']['count']:
-        adding = app.config['alias']['count']
-
-        for i in range(0,adding):
-            db.session.add(Alias(session["User"]))
-
-        db.session.commit()
-        aliases = session["User"].aliases
+    aliases = session["User"].populate_aliases()
 
     return render_template("aliases.html", aliases=aliases)
