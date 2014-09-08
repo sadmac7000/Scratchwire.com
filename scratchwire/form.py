@@ -166,11 +166,8 @@ class Form(object):
         """
         Render the form as HTML
         """
-        try:
-            return Markup(render_template("form/%s.html" % \
-                    decamel(self.__class__.__name__), form=self))
-        except TemplateNotFound:
-            return Markup(render_template("form/_default.html", form=self))
+        return Markup(render_template("form/%s.html" % self.template, \
+                form=self))
 
     def __repr__(self):
         """

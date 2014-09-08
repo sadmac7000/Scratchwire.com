@@ -108,6 +108,7 @@ class LoginForm(Form):
         return bail_redirect()
 
     action = 'login'
+    template = 'login'
 
 class RegistrationForm(LoginForm):
     @element(label="Confirm Password", ftype="password")
@@ -153,6 +154,7 @@ class RegistrationForm(LoginForm):
         return bail_redirect()
 
     action = 'register'
+    template = 'register'
 
 class VerifyForm(LoginForm):
     def setup(self):
@@ -190,6 +192,7 @@ class VerifyForm(LoginForm):
         return bail_redirect()
 
     action = 'verify'
+    template = 'verify'
 
 LoginForm.route(app, '/login', 'login')
 RegistrationForm.route(app, '/register', 'register')
