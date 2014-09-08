@@ -1,11 +1,11 @@
 from scratchwire import app
-from scratchwire.model import db, User, VerifyUrl
+from scratchwire.model import db, User, VerifyUrl, Alias
 from flask import render_template, url_for, request, session, redirect, flash
 from flask import abort
 from scratchwire.form import Form, element
 from scratchwire.mailer import Email
 from validate_email import validate_email
-from scratchwire.util import monoize_multi, bail_redirect
+from scratchwire.util import monoize_multi, bail_redirect, requires_login
 from datetime import datetime
 
 @app.before_request
@@ -178,3 +178,19 @@ def logout():
     if session.has_key("User"):
         del session["User"]
     return bail_redirect()
+
+@app.route('/aliases')
+@requires_login
+def aliases():
+    aliases = session["User"].aliases
+
+    if len(aliases) < app.config['alias']['count']:
+        adding = app.config['alias']['count']
+
+        for i in range(0,adding):
+            db.session.add(Alias(session["User"]))
+
+        db.session.commit()
+        aliases = session["User"].aliases
+
+    return render_template("aliases.html", aliases=aliases)

@@ -1,4 +1,5 @@
-from flask import redirect, url_for
+from flask import redirect, url_for, request, session
+from decorator import decorator
 
 def monoize_multi(multidict):
     """
@@ -26,6 +27,30 @@ def bail_redirect():
     redirect.
     """
 
-    # FIXME: make this do something more ornate
-    return redirect(url_for('home'))
 
+    if session.has_key('bail_point'):
+        target = session['bail_point'][0]
+        args = session['bail_point'][1]
+
+        del session['bail_point']
+
+        return redirect(url_for(target, **args))
+
+    return redirect(url_for(home))
+
+def set_bail_point(target=None, **args):
+    session['bail_point'] = (request.endpoint, request.view_args)
+
+    if target != None:
+        return redirect(url_for(target, **args))
+
+def clear_bail_point():
+    if session.has_key['bail_point']:
+        del session['bail_point']
+
+@decorator
+def requires_login(f, *args, **kwargs):
+    if session.has_key('User'):
+        return f(*args, **kwargs)
+
+    return set_bail_point('login')
