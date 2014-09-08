@@ -58,17 +58,28 @@ def bail_redirect():
     return redirect(url_for('home'))
 
 def set_bail_point(target=None, **args):
+    """
+    Set where bail_redirect will redirect to. If target is specified we will
+    also redirect to the given target.
+    """
     session['bail_point'] = (request.endpoint, request.view_args)
 
     if target != None:
         return redirect(url_for(target, **args))
 
 def clear_bail_point():
+    """
+    Clear the bail point so bail_redirect will just send us home again.
+    """
     if session.has_key['bail_point']:
         del session['bail_point']
 
 @decorator
 def requires_login(f, *args, **kwargs):
+    """
+    Decorator for a route handler that redirects to the login page if the user
+    isn't logged in.
+    """
     if session.has_key('User'):
         return f(*args, **kwargs)
 
