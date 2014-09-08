@@ -17,7 +17,7 @@
 # along with foobar.  if not, see <http://www.gnu.org/licenses/>.
 
 from scratchwire.model import db, User, VerifyUrl, Alias
-from flask import session, abort
+from flask import session, abort, flash
 from scratchwire.form import Form, element
 from validate_email import validate_email
 from scratchwire.util import bail_redirect
