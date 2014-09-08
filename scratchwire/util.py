@@ -18,6 +18,7 @@
 
 from flask import redirect, url_for, request, session
 from decorator import decorator
+import re
 
 def monoize_multi(multidict):
     """
@@ -72,3 +73,10 @@ def requires_login(f, *args, **kwargs):
         return f(*args, **kwargs)
 
     return set_bail_point('login')
+
+decamel_re = re.compile(r'(.)([A-Z])')
+
+def decamel(string):
+    """De-CamelCase a string"""
+
+    return re.sub(decamel_re, r'\1_\2', string).lower()
