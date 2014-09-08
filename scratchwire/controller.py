@@ -42,6 +42,16 @@ def expire_user():
     except ObjectDeletedError:
         del session['User']
 
+@app.before_request
+def map_method():
+    if not request.method == 'POST':
+        return
+    if not request.form.has_key('_method'):
+        return
+
+    request.method = request.form['_method']
+    del request.form['_method']
+
 class LoginForm(Form):
     """
     Standard issue login form. Nothing exciting here.
