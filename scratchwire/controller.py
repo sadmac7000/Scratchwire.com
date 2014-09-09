@@ -45,8 +45,8 @@ def map_method():
     if not request.form.has_key('_method'):
         return
 
-    request.method = request.form['_method']
-    del request.form['_method']
+    method = request.form['_method']
+    request.environ['REQUEST_METHOD'] = method
 
 LoginForm.route(app, '/login', 'login')
 RegistrationForm.route(app, '/register', 'register')
