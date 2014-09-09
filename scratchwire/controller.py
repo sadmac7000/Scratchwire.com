@@ -18,9 +18,10 @@
 
 from scratchwire import app
 from scratchwire.model import db, Alias
-from flask import render_template, session, request
-from scratchwire.util import requires_login, bail_redirect
+from flask import render_template, session, request, redirect, url_for, abort
+from scratchwire.util import requires_login_403, requires_login, bail_redirect
 from scratchwire.app_forms import LoginForm, RegistrationForm, VerifyForm
+from scratchwire.app_forms import DeleteAlias
 
 @app.before_request
 def expire_user():
@@ -70,4 +71,21 @@ def logout():
 def aliases():
     aliases = session["User"].populate_aliases()
 
-    return render_template("aliases.html", aliases=aliases)
+    return render_template("aliases.html", aliases=aliases, \
+            DeleteAlias=DeleteAlias)
+
+@app.route('/aliases/<alias>', methods=['POST', 'DELETE'])
+@requires_login_403
+def delete_alias(alias):
+    if request.method != 'DELETE':
+        abort(405)
+
+    for item in session["User"].aliases:
+        if item.name != alias:
+            continue
+
+        db.session.delete(item)
+        db.session.commit()
+        return redirect(url_for('aliases'))
+
+    abort(403)

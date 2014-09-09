@@ -20,7 +20,7 @@
 {% block content %}
 <ul>
   {% for alias in aliases %}
-  <li>{{alias.name}}
+  <li>{{alias.name}}{{DeleteAlias({'alias':alias.name}).render()}}</li>
   {% endfor %}
 </ul>
 {% endblock %}

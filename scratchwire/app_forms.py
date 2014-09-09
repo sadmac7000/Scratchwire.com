@@ -18,7 +18,7 @@
 
 from scratchwire.model import db, User, VerifyUrl, Alias
 from flask import session, abort, flash
-from scratchwire.form import Form, element
+from scratchwire.form import Form, element, hidden_element
 from validate_email import validate_email
 from scratchwire.util import bail_redirect
 from datetime import datetime
@@ -167,3 +167,8 @@ class VerifyForm(LoginForm):
     action = 'verify'
     template = 'verify'
 
+class DeleteAlias(Form):
+    meth = hidden_element('_method', 'DELETE')
+
+    action = 'delete_alias'
+    template = 'delete_alias'
