@@ -36,6 +36,7 @@
       <p>Logged in as {{session['User'].email}}</p>
     {% endif %}
     <nav>
+      <a href="{{url_for('register')}}">Register</a>
       <a href="{{url_for('login')}}">Log in</a>
       <a href="{{url_for('logout')}}">Log out</a>
       <a href="{{url_for('aliases')}}">Aliases</a>
