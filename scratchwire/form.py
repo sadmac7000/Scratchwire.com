@@ -89,6 +89,15 @@ class element(object):
         return FormElement(validator.__name__, self.label, self.ftype, self.content,
                 validator, self.template)
 
+def hidden_element(name, content = ""):
+    """
+    A constructor for hidden elements.
+    """
+
+    def do_nothing(x,y): pass
+    return FormElement(name, "", "hidden", content, do_nothing, \
+            "form/bare_field.html")
+
 class Form(object):
     """
     A web form. Capable of self-validating and of rendering itself as HTML.
