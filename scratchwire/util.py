@@ -16,7 +16,7 @@
 # you should have received a copy of the gnu general public license
 # along with foobar.  if not, see <http://www.gnu.org/licenses/>.
 
-from flask import redirect, url_for, request, session
+from flask import redirect, url_for, request, session, abort
 from decorator import decorator
 import re
 
@@ -83,6 +83,16 @@ def requires_login(f, *args, **kwargs):
         return f(*args, **kwargs)
 
     return set_bail_point('login')
+
+@decorator
+def requires_login_403(f, *args, **kwargs):
+    """
+    Decorator for a route handler that aborts with 403 if you aren't logged in.
+    """
+    if session.has_key('User'):
+        return f(*args, **kwargs)
+
+    abort(403)
 
 decamel_re = re.compile(r'(.)([A-Z])')
 
