@@ -25,7 +25,7 @@ class FormElement(object):
     """
     A single element of a web form.
     """
-    def __init__(self, name, label, ftype, content, validate):
+    def __init__(self, name, label, ftype, content, validate, template):
         """
         Initialize our Form element.
         """
@@ -35,6 +35,7 @@ class FormElement(object):
         self.ftype = ftype
         self.content = content
         self.validate = validate
+        self.template = template
         self.value = None
 
     def __repr__(self):
@@ -62,7 +63,7 @@ class FormElement(object):
         """
         Render the HTML necessary to draw this form element.
         """
-        return Markup(render_template("form/field.html", field=self))
+        return Markup(render_template(self.template, field=self))
 
 class element(object):
     """
@@ -70,13 +71,15 @@ class element(object):
     form element.
     """
 
-    def __init__(self, label, ftype, content = ""):
+    def __init__(self, label, ftype, content = "",
+            template = "form/field.html"):
         """
         Store the decorator arguments
         """
         self.label = label
         self.ftype = ftype
         self.content = content
+        self.template = template
 
     def __call__(self, validator):
         """
@@ -84,7 +87,7 @@ class element(object):
         validation.
         """
         return FormElement(validator.__name__, self.label, self.ftype, self.content,
-                validator)
+                validator, self.template)
 
 class Form(object):
     """
